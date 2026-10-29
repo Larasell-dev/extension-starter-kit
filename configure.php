@@ -32,7 +32,7 @@ $class = $studly($name);
 $slug = str_replace(['_', '.'], '-', $name);
 
 $replacements = [
-    'larasell-dev/extension' => "{$vendor}/{$name}",
+    'larasell-dev/extension-starter-kit' => "{$vendor}/{$name}",
     'Larasell\\\\Extension' => str_replace('\\', '\\\\', $namespace),
     'Larasell\\Extension' => $namespace,
     'ExtensionServiceProvider' => "{$class}ServiceProvider",

@@ -19,7 +19,7 @@ and deletes itself.
 ## Installation
 
 ```bash
-composer require larasell-dev/extension
+composer require larasell-dev/extension-starter-kit
 php artisan migrate
 ```
 
