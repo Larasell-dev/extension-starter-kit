@@ -14,7 +14,7 @@ composer test
 ```
 
 `configure.php` renames the package, namespace, service provider and config, removes this section
-and deletes itself. Read [AGENTS.md](AGENTS.md) for the conventions; coding agents read it too.
+and deletes itself.
 
 <!-- template:end -->
 ## Installation
