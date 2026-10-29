@@ -31,7 +31,9 @@ composer test       # Pest
 composer phpstan    # Larastan, level 8
 composer lint       # Pint
 npm run commitlint  # Commitlint on the last commit
+composer serve      # The playground, see below
 ```
 
-`vendor/bin/testbench serve` runs a playground: a Larasell admin panel with this extension
-installed. In an Amp orb, `.agents/setup` prepares it and `.amp/services.yaml` serves it.
+`composer serve` runs a playground: a Larasell admin panel with this extension installed, at
+http://localhost:8000/admin. Open `/admin/__dev/login` to sign in as an admin. `composer
+playground` prepares it without serving, e.g. after adding a migration or sample data.
