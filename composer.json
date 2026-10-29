@@ -5,7 +5,7 @@
   "license": "MIT",
   "require": {
     "php": "^8.3",
-    "larasell-dev/admin": "dev-main",
+    "larasell-dev/admin": "^0.5",
     "larasell-dev/larasell": "^1.18",
     "laravel/framework": "^13.23"
   },
@@ -52,7 +52,6 @@
     "test": "vendor/bin/pest",
     "playground": [
       "@php -r \"touch('vendor/orchestra/testbench-core/laravel/database/database.sqlite');\"",
-      "[ -f vendor/larasell-dev/admin/public/vendor/larasell-admin/manifest.json ] || (cd vendor/larasell-dev/admin && npm ci --no-audit --no-fund --loglevel=error && npm run build --silent)",
       "@php vendor/bin/testbench migrate --force --no-interaction",
       "@php vendor/bin/testbench larasell:link",
       "@php vendor/bin/testbench db:seed --class=\"Workbench\\Database\\Seeders\\DatabaseSeeder\" --force --no-interaction"
