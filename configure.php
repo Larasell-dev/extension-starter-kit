@@ -71,6 +71,9 @@ rename("{$root}/src/ExtensionServiceProvider.php", "{$root}/src/{$class}ServiceP
 rename("{$root}/config/larasell/extension.php", "{$root}/config/larasell/{$slug}.php");
 unlink(__FILE__);
 
+// composer create-project writes a lock file for the old name.
+@unlink("{$root}/composer.lock");
+
 echo "Configured {$vendor}/{$name} in {$namespace}.\n";
 // Renaming can change the order of use statements, which Pint fixes.
 echo "Next: composer install && composer lint && composer test\n";
