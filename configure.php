@@ -73,4 +73,4 @@ unlink(__FILE__);
 
 echo "Configured {$vendor}/{$name} in {$namespace}.\n";
 // Renaming can change the order of use statements, which Pint fixes.
-echo "Next: composer install && npm install && composer lint && composer test\n";
+echo "Next: composer install && composer lint && composer test\n";

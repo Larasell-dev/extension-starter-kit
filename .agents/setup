@@ -65,10 +65,6 @@ fi
 step "Installing PHP dependencies"
 composer install --no-interaction --no-progress
 
-# Commitlint only; npm ci keeps package-lock.json untouched and uses the npm cache on warm runs.
-step "Installing Node dependencies"
-npm ci --no-audit --no-fund --loglevel=error
-
 # --- Admin panel assets ---
 # larasell-dev/admin is installed from dev-main, which has no built assets (only release tags
 # ship them). Build them in the installed package, and again whenever composer installs a

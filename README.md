@@ -8,7 +8,6 @@ extension:
 ```bash
 php configure.php --vendor=acme --name=wishlists
 composer install
-npm install
 composer lint   # renaming can change the order of use statements
 composer test
 ```
@@ -30,7 +29,6 @@ php artisan migrate
 composer test       # Pest
 composer phpstan    # Larastan, level 8
 composer lint       # Pint
-npm run commitlint  # Commitlint on the last commit
 composer serve      # The playground, see below
 ```
 
