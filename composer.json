@@ -1,0 +1,54 @@
+{
+  "name": "larasell-dev/extension",
+  "description": "A Larasell extension",
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": "^8.3",
+    "larasell-dev/admin": "dev-main",
+    "larasell-dev/larasell": "^1.18",
+    "laravel/framework": "^13.23"
+  },
+  "require-dev": {
+    "larastan/larastan": "^3.0",
+    "laravel/pint": "^1.32",
+    "orchestra/testbench": "^11.0",
+    "pestphp/pest": "^4.7",
+    "pestphp/pest-plugin-laravel": "^4.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Larasell\\Extension\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Larasell\\Extension\\Tests\\": "tests/",
+      "Workbench\\App\\": "workbench/app/",
+      "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Larasell\\Extension\\ExtensionServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "stable",
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    },
+    "sort-packages": true,
+    "platform": {
+      "php": "8.3"
+    }
+  },
+  "scripts": {
+    "lint": "vendor/bin/pint",
+    "lint:check": "vendor/bin/pint --test",
+    "phpstan": "phpstan analyse",
+    "test": "vendor/bin/pest"
+  }
+}

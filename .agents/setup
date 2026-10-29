@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# Amp orb setup: installs the PHP 8.3 toolchain, all project dependencies, the admin panel's
+# built assets, and the Testbench playground served by .amp/services.yaml.
+# Safe to run repeatedly; a warm run skips package downloads, reinstalls, and rebuilds.
+set -euo pipefail
+
+step() {
+    echo "==> [setup] $(date -u +%H:%M:%S) $*"
+}
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+# System packages need root; Amp runs this script as "user", which has passwordless sudo.
+if [ "$(id -u)" -eq 0 ]; then
+    as_root() { "$@"; }
+else
+    as_root() { sudo -n "$@"; }
+fi
+
+# --- PHP 8.3 (Sury repository, Debian's default is 8.2) ---
+PHP_PACKAGES=(
+    php8.3-cli
+    php8.3-mbstring
+    php8.3-xml
+    php8.3-curl
+    php8.3-sqlite3
+    php8.3-zip
+    php8.3-intl
+    php8.3-bcmath
+    php8.3-gd
+)
+
+missing_php_packages=()
+for package in "${PHP_PACKAGES[@]}"; do
+    if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed'; then
+        missing_php_packages+=("$package")
+    fi
+done
+
+if [ "${#missing_php_packages[@]}" -gt 0 ]; then
+    step "Installing PHP 8.3 packages: ${missing_php_packages[*]}"
+    as_root apt-get update -qq
+    as_root apt-get install -y -qq ca-certificates curl gnupg2 >/dev/null
+    as_root install -d /usr/share/keyrings
+    as_root curl -fsSL https://packages.sury.org/php/apt.gpg -o /usr/share/keyrings/sury-php.gpg
+    echo "deb [signed-by=/usr/share/keyrings/sury-php.gpg] https://packages.sury.org/php bookworm main" \
+        | as_root tee /etc/apt/sources.list.d/sury-php.list >/dev/null
+    as_root apt-get update -qq
+    as_root apt-get install -y -qq "${missing_php_packages[@]}" >/dev/null
+else
+    step "PHP 8.3 packages already installed"
+fi
+
+# --- Composer ---
+if ! command -v composer >/dev/null 2>&1; then
+    step "Installing Composer"
+    as_root curl -fsSL https://getcomposer.org/download/latest-stable/composer.phar -o /usr/local/bin/composer
+    as_root chmod +x /usr/local/bin/composer
+else
+    step "Composer already installed"
+fi
+
+# --- Dependencies ---
+step "Installing PHP dependencies"
+composer install --no-interaction --no-progress
+
+# Commitlint only; npm ci keeps package-lock.json untouched and uses the npm cache on warm runs.
+step "Installing Node dependencies"
+npm ci --no-audit --no-fund --loglevel=error
+
+# --- Admin panel assets ---
+# larasell-dev/admin is installed from dev-main, which has no built assets (only release tags
+# ship them). Build them in the installed package, and again whenever composer installs a
+# different admin commit.
+admin_dir=vendor/larasell-dev/admin
+admin_ref="$(composer show larasell-dev/admin --format=json | php -r 'echo json_decode(stream_get_contents(STDIN), true)["source"]["reference"] ?? "";')"
+admin_stamp="$admin_dir/public/vendor/larasell-admin/.built-from"
+
+if [ -f "$admin_dir/public/vendor/larasell-admin/manifest.json" ] && [ "$(cat "$admin_stamp" 2>/dev/null)" = "$admin_ref" ]; then
+    step "Admin assets already built for $admin_ref"
+else
+    step "Building admin assets for $admin_ref"
+    (cd "$admin_dir" && npm ci --no-audit --no-fund --loglevel=error && npm run build --silent)
+    echo "$admin_ref" > "$admin_stamp"
+fi
+
+
+
+# --- Playground (Testbench, served by .amp/services.yaml) ---
+step "Preparing the playground"
+touch vendor/orchestra/testbench-core/laravel/database/database.sqlite
+vendor/bin/testbench migrate --force --no-interaction
+vendor/bin/testbench larasell:link
+if ! vendor/bin/testbench larasell:list-admins 2>/dev/null | grep -q 'admin@example.com'; then
+    vendor/bin/testbench larasell:create-admin --name=Admin --email=admin@example.com --password='Password-123!'
+fi
+# Sample data; see workbench/database/seeders.
+vendor/bin/testbench db:seed --class='Workbench\Database\Seeders\DatabaseSeeder' --force --no-interaction
+
+step "Setup complete"

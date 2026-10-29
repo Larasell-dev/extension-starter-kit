@@ -1,0 +1,13 @@
+/.phpunit.cache
+/node_modules
+/vendor
+/composer.lock
+/public/hot
+/public/vendor
+.env
+.phpunit.result.cache
+/.amp/*
+!/.amp/services.yaml
+/.idea
+/.vscode
+/.zed
