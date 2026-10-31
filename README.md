@@ -27,7 +27,7 @@ php artisan migrate
 
 ```bash
 composer test       # Pest
-composer phpstan    # Larastan, level 8
+composer phpstan    # Larastan and the Larasell rules, level 8
 composer lint       # Pint
 composer serve      # The playground, see below
 ```
